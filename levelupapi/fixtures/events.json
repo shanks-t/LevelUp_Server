@@ -1,0 +1,14 @@
+[
+    {
+        "model": "levelupapi.event",
+        "pk": 1,
+        "fields": {
+            "game": 1,
+            "organizer": 1,
+            "description": "All the WOW players are getting together for a bacchanal, byob my dude",
+            "date": "2006-10-25",
+            "time": "14:30:59",
+            "attendees": [1]
+        }
+    }
+]
