@@ -1,13 +1,14 @@
 """View module for handling requests about games"""
 from django.core.exceptions import ValidationError
-from rest_framework import status
 from django.http import HttpResponseServerError
+from django.contrib.auth.models import User
+
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
 from rest_framework import status
+
 from levelupapi.models import Event, Gamer, Game, GameType
-from levelupapi.views.gamer import GamerSerializer
 
 
 class EventView(ViewSet):
@@ -21,33 +22,26 @@ class EventView(ViewSet):
         """
 
 
-        attendees = Event.objects.get(pk=request.data["anttendees"])
-        organizer = Event.objects.get(pk=request.data["organizer"])
+        # attendees = Event.objects.get(pk=request.data["attendees"])
+        organizer = Gamer.objects.get(user=request.auth.user)
+        game = Game.objects.get(pk=request.data["gameId"])
 
-        # Try to save the new game to the database, then
-        # serialize the game instance as JSON, and send the
-        # JSON as a response to the client request
+
         try:
-            # Create a new Python instance of the Game class
-            # and set its properties from what was sent in the
-            # body of the request from the client.
+
             event = Event.objects.create(
-                game=request.data["game"],
+                game=game,
                 organizer=organizer,
                 description=request.data["description"],
                 date=request.data["date"],
-                time=request.data["time"],
-                attendees=attendees
+                time=request.data["time"]
             )
-            serializer = Eventserializer(event, context={'request': request})
+            serializer = EventSerializer(event, context={'request': request})
             return Response(serializer.data)
 
-        # If anything went wrong, catch the exception and
-        # send a response with a 400 status code to tell the
-        # client that something was wrong with its request data
+
         except ValidationError as ex:
             return Response({"reason": ex.message}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
     def retrieve(self, request, pk=None):
@@ -63,7 +57,7 @@ class EventView(ViewSet):
             #
             # The `2` at the end of the route becomes `pk`
             event = Event.objects.get(pk=pk)
-            serializer = Eventserializer(event, context={'request': request})
+            serializer = EventSerializer(event, context={'request': request})
             return Response(serializer.data)
         except Exception as ex:
             return HttpResponseServerError(ex)
@@ -79,18 +73,18 @@ class EventView(ViewSet):
         # creating a new instance of Game, get the game record
         # from the database whose primary key is `pk`
         event = Event.objects.get(pk=pk)
-        event.game = request.data["game"]
-        event.organizer = request.data["organizer"]
         event.description = request.data["description"]
         event.date = request.data["date"]
         event.time = request.data["time"]
-        event.attendees = request.data["attendees"]
-
+        organizer = Gamer.objects.get(user=request.auth.user)
+        event.organizer = organizer
+        game = Game.objects.get(pk=request.data['gameId'])
+        event.game = game
         event.save()
 
         # 204 status code means everything worked but the
         # server is not sending back any data in the response
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'Hey bruh, nice PUT'}, status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
         """Handle DELETE requests for a single game
@@ -102,7 +96,7 @@ class EventView(ViewSet):
             event = Event.objects.get(pk=pk)
             event.delete()
 
-            return Response({}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'Yo, you deleted that shit!'}, status=status.HTTP_204_NO_CONTENT)
 
         except Event.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)
@@ -123,13 +117,27 @@ class EventView(ViewSet):
         #    http://localhost:8000/games?type=1
         #
 
-        serializer = Eventserializer(
+        serializer = EventSerializer(
             events, many=True, context={'request': request})
         return Response(serializer.data)
 
-class Eventserializer(serializers.ModelSerializer):
-    organizer = GamerSerializer()
+class EventUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
+
+class EventGamerSerializer(serializers.ModelSerializer):
+    user = EventUserSerializer()
+    class Meta:
+        model = Gamer
+        fields = ['user']
+
+class EventSerializer(serializers.ModelSerializer):
+    organizer = EventGamerSerializer(many=False)
     
     class Meta:
         model = Event
         fields = ['id', 'game', 'organizer', 'description', 'date', 'time', 'attendees']
+        depth = 1
+
+

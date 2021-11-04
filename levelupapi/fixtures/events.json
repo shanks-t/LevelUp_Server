@@ -10,5 +10,17 @@
             "time": "14:30:59",
             "attendees": [1]
         }
+    },
+    {
+        "model": "levelupapi.event",
+        "pk": 2,
+        "fields": {
+            "game": 2,
+            "organizer": 1,
+            "description": "Welcome to the schmetaverse",
+            "date": "2006-10-25",
+            "time": "14:30:59",
+            "attendees": [1]
+        }
     }
 ]

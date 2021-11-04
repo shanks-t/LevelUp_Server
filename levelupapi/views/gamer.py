@@ -3,8 +3,8 @@ from django.http import HttpResponseServerError
 from rest_framework.viewsets import ViewSet
 from rest_framework.response import Response
 from rest_framework import serializers
+from django.contrib.auth.models import User
 from levelupapi.models import Gamer
-from levelupapi.views.user import UserSerializer
 
 
 
@@ -39,8 +39,13 @@ class GamerView(ViewSet):
             gamer, many=False, context={'request': request})
         return Response(serializer.data)
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name']
+
 class GamerSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
         model = Gamer
-        fields = ['user']
+        fields = ['user', 'bio']

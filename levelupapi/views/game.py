@@ -95,7 +95,7 @@ class GameView(ViewSet):
 
         # 204 status code means everything worked but the
         # server is not sending back any data in the response
-        return Response({}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'Hey bruh, nice PUT'}, status=status.HTTP_204_NO_CONTENT)
 
     def destroy(self, request, pk=None):
         """Handle DELETE requests for a single game
