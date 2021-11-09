@@ -23,7 +23,7 @@ def user_profile(request):
     attending = events.filter(attendees__id=gamer.id)
     # TODO: Use the orm to filter events if the gamer is hosting the event
     # hosting =
-    hosting = events.filter(organizer_id=gamer.id)
+    hosting = events.filter(organizer__id=gamer.id)
 
     attending = EventSerializer(
         attending, many=True, context={'request': request})

@@ -176,7 +176,7 @@ class EventGamerSerializer(serializers.ModelSerializer):
 
 class EventSerializer(serializers.ModelSerializer):
     organizer = EventGamerSerializer(many=False)
-    joined = serializers.BooleanField()
+    joined = serializers.BooleanField(required=False)
     
     class Meta:
         model = Event
