@@ -97,7 +97,7 @@ class EventView(ViewSet):
             event = Event.objects.get(pk=pk)
             event.delete()
 
-            return Response({'Yo, you deleted that shit!'}, status=status.HTTP_204_NO_CONTENT)
+            return Response({'Yo, you deleted that ish!'}, status=status.HTTP_204_NO_CONTENT)
 
         except Event.DoesNotExist as ex:
             return Response({'message': ex.args[0]}, status=status.HTTP_404_NOT_FOUND)

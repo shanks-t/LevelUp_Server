@@ -9,5 +9,5 @@ class Event(models.Model):
     time = models.TimeField()
     attendees = models.ManyToManyField("Gamer", through="EventGamer", related_name="attending")
 
-    # def __str__(self):
-    #     return self.description
+    def __str__(self):
+        return self.description

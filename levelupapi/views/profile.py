@@ -19,10 +19,10 @@ def user_profile(request):
     gamer = Gamer.objects.get(user=request.auth.user)
     events = Event.objects.all()
     # TODO: Use the django orm to filter events if the gamer is attending the event
-    # attending = 
+    # attending = gamer.attending.all()
     attending = events.filter(attendees__id=gamer.id)
     # TODO: Use the orm to filter events if the gamer is hosting the event
-    # hosting =
+    # hosting = gamer.event_set
     hosting = events.filter(organizer__id=gamer.id)
 
     attending = EventSerializer(
